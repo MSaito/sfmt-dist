@@ -1,0 +1,4 @@
+#EXTRA_DIST = include
+SUBDIRS = src include
+ACLOCAL_AMFLAGS = -I m4
+AM_CXXFLAGS = -O3 -Wall -Wextra -D__STDC_CONSTANT_MACROS
