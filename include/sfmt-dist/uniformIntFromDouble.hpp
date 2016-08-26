@@ -3,6 +3,8 @@
 #define SFMT_DIST_UNIFORMINTFROMDOUBLE_H
 
 #include <cstddef>
+#include <stdint.h>
+#include <inttypes.h>
 #include <sfmt-dist/aligned_alloc.h>
 #include <sfmt-dist/dSFMT19937.h>
 
@@ -11,10 +13,10 @@ namespace MersenneTwister {
     /*
      * use internal buffer
      */
-    template<typename T, typename E = DSFMT19937>
+    template<typename E = DSFMT19937>
     class UniformIntFromDouble {
     public:
-        UniformIntFromDouble(T start, T end,
+        UniformIntFromDouble(int32_t start, int32_t end,
                              typename E::seed_type seed = 1234) {
             engine.seed(seed);
             range_start = start;
@@ -28,15 +30,15 @@ namespace MersenneTwister {
             alignedFree(buffer);
         }
 
-        T generate() {
+        int32_t generate() {
             if (index >= buffer_size) {
                 engine.fillArrayMaxInt(buffer, max, range_start);
                 index = 0;
             }
-            return static_cast<T>(buffer[index++]);
+            return buffer[index++];
         }
 
-        T operator()() {
+        int32_t operator()() {
             return generate();
         }
 

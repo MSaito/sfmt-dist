@@ -12,6 +12,7 @@
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
+#include "getopt.hpp"
 
 using namespace std;
 
@@ -56,55 +57,32 @@ int d_speed(T p1, T p2, uint32_t seed, uint64_t count)
 
 int main(int argc, char * argv[])
 {
-    uint64_t count = 100000000;
-    uint32_t seed = 1234;
-    uint32_t start = 0;
-    uint32_t end = 200;
-    if (argc <= 2) {
-        cout << argv[0] << " [-n|-u] [-m|-M|-S|-d] [seed]" << endl;
-        cout << "-n     normal distribution" << endl;
-        cout << "-u     uniform distribution" << endl;
-        cout << "-m     mersennetwister19937" << endl;
-        cout << "-M     MersenneTwister19937" << endl;
-        cout << "-S     SFMT19937" << endl;
-        cout << "-d     dSFMT19937" << endl;
-        cout << "seed   seed" << endl;
+    options opt;
+    opt.count = 100000000;
+    opt.seed = 1234;
+    opt.start = 0;
+    opt.end = 200;
+    if (!opt.parse(argc, argv)) {
         return -1;
     }
-    bool is_normal = false;
-    bool is_uniform = true;
-    if (argv[1][1] == 'n') {
-        is_normal = true;
-        is_uniform = false;
-    } else if (argv[1][1] == 'u') {
-        is_normal = false;
-        is_uniform = true;
-    }
-    if (argc >= 4) {
-        errno = 0;
-        seed = strtoul(argv[3], NULL, 10);
-        if (errno) {
-            cout << "seed must be a number" << endl;
-            return -1;
-        }
-    }
+    uint64_t count = opt.count;
+    uint32_t seed = opt.seed;
+    int32_t start = opt.start;
+    int32_t end = opt.end;
     typedef uniform_int_distribution<uint32_t> unif;
     typedef normal_distribution<> norm;
     typedef MersenneTwister::UniformIntFromDouble
-        <uint32_t, MersenneTwister::DSFMT19937> dunif;
+        <MersenneTwister::DSFMT19937> dunif;
     typedef MersenneTwister::NormalFromDouble
         <MersenneTwister::DSFMT19937> dnorm;
     std::mt19937 mt(seed);
     MersenneTwister::MT19937 MT(seed);
     MersenneTwister::SFMT19937 sfmt(seed);
-    //unif udist(start, end);
-    //dunif dudist(start, end, seed);
-    //norm ndist(0, 1.0);
-    //dnorm dndist(0, 1.0, seed);
-    if (is_uniform) {
-        cout << "#uniform distribution time for " << dec << count
+    if (opt.uniform_dist) {
+        cout << "#uniform distribution[" << start << ","
+             << end << "] time for " << dec << count
              << " generation" << endl;
-        switch (argv[2][1]) {
+        switch (opt.generator_kind) {
         case 'm':
             cout << "std::mt19937,";
             speed<uint32_t, unif, std::mt19937>(start, end, mt, count);
@@ -126,10 +104,10 @@ int main(int argc, char * argv[])
         default:
             break;
         }
-    } else if (is_normal) {
+    } else if (opt.normal_dist) {
         cout << "#normal distribution for " << dec << count
              << " generation" << endl;
-        switch (argv[2][1]) {
+        switch (opt.generator_kind) {
         case 'm':
             cout << "std::mt19937,";
             //std::mt19937 mt(seed);
