@@ -34,6 +34,7 @@ public:
             {"mt-mt", optional_argument, NULL, 'M'},
             {"sfmt", optional_argument, NULL, 'S'},
             {"dsfmt", optional_argument, NULL, 'd'},
+            {"dsfmtavx", optional_argument, NULL, 'a'},
             {"seed", required_argument, NULL, 's'},
             {"count", required_argument, NULL, 'c'},
             {"start", required_argument, NULL, 'f'},
@@ -41,7 +42,7 @@ public:
             {NULL, 0, NULL, 0}};
         errno = 0;
         for (;;) {
-            c = getopt_long(argc, argv, "numMSds:c:f:l:", longopts, NULL);
+            c = getopt_long(argc, argv, "numMSdas:c:f:l:", longopts, NULL);
             if (error) {
                 break;
             }
@@ -87,6 +88,7 @@ public:
             case 'M':
             case 'S':
             case 'd':
+            case 'a':
                 generator_kind = c;
                 break;
             case '?':
@@ -120,6 +122,7 @@ public:
         cout << "-M --mt-mt    MersenneTwister19937" << endl;
         cout << "-S --sfmt     SFMT19937" << endl;
         cout << "-d --dsfmt    dSFMT19937" << endl;
+        cout << "-a --dsfmtavx dSFMTAVX607" << endl;
         cout << "-s --seed     seed" << endl;
         cout << "-c --count    count" << endl;
         cout << "-f --start    start of uniform range" << endl;

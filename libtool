@@ -1,5 +1,5 @@
 #! /bin/sh
-# Generated automatically by config.status (sfmt-dist) 0.1
+# Generated automatically by config.status (sfmt-dist) 0.1.1
 # Libtool was configured on host Mac-mini.local:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 
@@ -91,7 +91,7 @@ EGREP="/usr/bin/grep -E"
 FGREP="/usr/bin/grep -F"
 
 # A BSD- or MS-compatible name lister.
-NM="/usr/bin/nm -B"
+NM="/opt/local/bin/nm -B"
 
 # Whether we need soft or hard links.
 LN_S="ln -s"

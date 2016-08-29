@@ -9,6 +9,7 @@
 #include <random>
 #include <sfmt-dist/sfmt19937.h>
 #include <sfmt-dist/dSFMT19937.h>
+#include <sfmt-dist/dSFMTAVX607.h>
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
@@ -42,12 +43,12 @@ int uniform(uint64_t count, uint32_t seed, int32_t start, int32_t end)
     return 0;
 }
 
+template<typename Engine>
 int d_normal(uint64_t count, uint32_t seed)
 {
     using MersenneTwister::NormalFromDouble;
-    using MersenneTwister::DSFMT19937;
 
-    NormalFromDouble<DSFMT19937> dist(0.0, 1.0, seed) ;
+    NormalFromDouble<Engine> dist(0.0, 1.0, seed) ;
     cout.setf(std::ios::fixed);
     for (uint64_t i = 0; i < count; ++i) {
         cout << dec << setprecision(20) << dist() << endl;
@@ -55,12 +56,12 @@ int d_normal(uint64_t count, uint32_t seed)
     return 0;
 }
 
+template<typename Engine>
 int d_uniform(uint64_t count, uint32_t seed, int32_t start, int32_t end)
 {
     using MersenneTwister::UniformIntFromDouble;
-    using MersenneTwister::DSFMT19937;
 
-    UniformIntFromDouble<DSFMT19937> dist(start, end, seed) ;
+    UniformIntFromDouble<Engine> dist(start, end, seed) ;
     cout.setf(std::ios::fixed);
     for (uint64_t i = 0; i < count; ++i) {
         cout << dec << dist() << endl;
@@ -99,7 +100,11 @@ int main(int argc, char * argv[])
             break;
         case 'd':
             cout << "MersenneTwister::dSFMT19937" << endl;
-            d_uniform(count, seed, start, end);
+            d_uniform<MersenneTwister::DSFMT19937>(count, seed, start, end);
+            break;
+        case 'a':
+            cout << "MersenneTwister::dSFMTAVX607" << endl;
+            d_uniform<MersenneTwister::DSFMTAVX607>(count, seed, start, end);
             break;
         default:
             break;
@@ -121,7 +126,11 @@ int main(int argc, char * argv[])
             break;
         case 'd':
             cout << "MersenneTwister::dSFMT19937" << endl;
-            d_normal(count, seed);
+            d_normal<MersenneTwister::DSFMT19937>(count, seed);
+            break;
+        case 'a':
+            cout << "MersenneTwister::dSFMTAVX607" << endl;
+            d_normal<MersenneTwister::DSFMTAVX607>(count, seed);
             break;
         default:
             break;
