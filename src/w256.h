@@ -26,6 +26,7 @@ namespace MersenneTwister {
 #if HAVE_IMMINTRIN_H
         __m256i   si256;
         __m256d   sd256;
+        __m128d   sd128[2];
 #endif
     };
 

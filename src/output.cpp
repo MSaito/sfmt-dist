@@ -10,9 +10,11 @@
 #include <sfmt-dist/sfmt19937.h>
 #include <sfmt-dist/dSFMT19937.h>
 #include <sfmt-dist/dSFMTAVX607.h>
+#include <sfmt-dist/dSFMTAVX19937.h>
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
+//#include "dSFMTAVX.hpp"
 #include "getopt.hpp"
 
 using std::cout;
@@ -106,6 +108,11 @@ int main(int argc, char * argv[])
             cout << "MersenneTwister::dSFMTAVX607" << endl;
             d_uniform<MersenneTwister::DSFMTAVX607>(count, seed, start, end);
             break;
+        case 'A':
+            cout << "MersenneTwister::dSFMTAVX19937" << endl;
+            d_uniform<MersenneTwister::DSFMTAVX19937>(count,
+                                                      seed, start, end);
+            break;
         default:
             break;
         }
@@ -131,6 +138,10 @@ int main(int argc, char * argv[])
         case 'a':
             cout << "MersenneTwister::dSFMTAVX607" << endl;
             d_normal<MersenneTwister::DSFMTAVX607>(count, seed);
+            break;
+        case 'A':
+            cout << "MersenneTwister::dSFMTAVX19937" << endl;
+            d_normal<MersenneTwister::DSFMTAVX19937>(count, seed);
             break;
         default:
             break;

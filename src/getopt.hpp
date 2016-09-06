@@ -35,6 +35,7 @@ public:
             {"sfmt", optional_argument, NULL, 'S'},
             {"dsfmt", optional_argument, NULL, 'd'},
             {"dsfmtavx", optional_argument, NULL, 'a'},
+            {"dsfmtavx19937", optional_argument, NULL, 'A'},
             {"seed", required_argument, NULL, 's'},
             {"count", required_argument, NULL, 'c'},
             {"start", required_argument, NULL, 'f'},
@@ -42,7 +43,7 @@ public:
             {NULL, 0, NULL, 0}};
         errno = 0;
         for (;;) {
-            c = getopt_long(argc, argv, "numMSdas:c:f:l:", longopts, NULL);
+            c = getopt_long(argc, argv, "numMSdaAs:c:f:l:", longopts, NULL);
             if (error) {
                 break;
             }
@@ -89,6 +90,7 @@ public:
             case 'S':
             case 'd':
             case 'a':
+            case 'A':
                 generator_kind = c;
                 break;
             case '?':
@@ -123,6 +125,7 @@ public:
         cout << "-S --sfmt     SFMT19937" << endl;
         cout << "-d --dsfmt    dSFMT19937" << endl;
         cout << "-a --dsfmtavx dSFMTAVX607" << endl;
+        cout << "-A --dsfmtavx dSFMTAVX19937" << endl;
         cout << "-s --seed     seed" << endl;
         cout << "-c --count    count" << endl;
         cout << "-f --start    start of uniform range" << endl;

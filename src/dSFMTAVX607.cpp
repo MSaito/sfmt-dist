@@ -86,8 +86,8 @@ namespace {
         __m128d b = _mm_add_pd(b0->sd128, m_one128.sd128);
         a = _mm_mul_pd(a, max128);
         b = _mm_mul_pd(b, max128);
-        __m128i y1 = _mm_cvtpd_epi32(a);
-        __m128i y2 = _mm_cvtpd_epi32(b);
+        __m128i y1 = _mm_cvttpd_epi32(a);
+        __m128i y2 = _mm_cvttpd_epi32(b);
         y2 = _mm_shuffle_epi32(y2, 0x4e); // 0b01001110
         __m128i c = _mm_or_si128(y1, y2);
         c = _mm_add_epi32(c, min128);
@@ -98,8 +98,8 @@ namespace {
                              uint64_t rmax, int32_t min)
     {
         DMSG("fillArray128_maxint step 1");
-        uint32_t mxcsr = _mm_getcsr();
-        _mm_setcsr((mxcsr & 0x9fff) | 0x6000); // truncate to zero
+        //uint32_t mxcsr = _mm_getcsr();
+        //_mm_setcsr((mxcsr & 0x9fff) | 0x6000); // truncate to zero
         w128_t * pstate = reinterpret_cast<w128_t *>(state);
         w128_t * array = reinterpret_cast<w128_t *>(array32);
         __m128i min128 = _mm_set1_epi32(min);
@@ -111,7 +111,7 @@ namespace {
         fillState64(state);
         array[2].si128 = do_uniform128(&pstate[0], &pstate[1], max128, min128);
         array[3].si128 = do_uniform128(&pstate[2], &pstate[3], max128, min128);
-        _mm_setcsr(mxcsr);
+        //_mm_setcsr(mxcsr);
     }
 
     inline void do_boxmuller128(__m128d *axy, double * ar, w128_t *in,
@@ -384,7 +384,7 @@ namespace {
     {
         __m256d a = _mm256_add_pd(a0->sd256, m_one.sd256);
         a = _mm256_mul_pd(a, max256);
-        __m128i y = _mm256_cvtpd_epi32(a);
+        __m128i y = _mm256_cvttpd_epi32(a);
         return  _mm_add_epi32(y, min128);
     }
 
@@ -392,8 +392,8 @@ namespace {
                              uint64_t rmax, int32_t min)
     {
         DMSG("fillArray128_maxint step 1");
-        uint32_t mxcsr = _mm_getcsr();
-        _mm_setcsr((mxcsr & 0x9fff) | 0x6000); // truncate to zero
+        //uint32_t mxcsr = _mm_getcsr();
+        //_mm_setcsr((mxcsr & 0x9fff) | 0x6000); // truncate to zero
         w256_t * pstate = reinterpret_cast<w256_t *>(state);
         w128_t * array = reinterpret_cast<w128_t *>(array32);
         __m128i min128 = _mm_set1_epi32(min);
@@ -406,7 +406,7 @@ namespace {
         fillState256(state);
         array[2].si128 = do_uniform256(&pstate[0], max256, min128);
         array[3].si128 = do_uniform256(&pstate[1], max256, min128);
-        _mm_setcsr(mxcsr);
+        //_mm_setcsr(mxcsr);
         _mm256_zeroall();
     }
 #if 0

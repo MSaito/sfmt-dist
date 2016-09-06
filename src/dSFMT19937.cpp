@@ -316,8 +316,8 @@ namespace {
         b = _mm_add_pd(b, m_one.sd128);
         a = _mm_mul_pd(a, max128);
         b = _mm_mul_pd(b, max128);
-        __m128i y1 = _mm_cvtpd_epi32(a);
-        __m128i y2 = _mm_cvtpd_epi32(b);
+        __m128i y1 = _mm_cvttpd_epi32(a);
+        __m128i y2 = _mm_cvttpd_epi32(b);
         y2 = _mm_shuffle_epi32(y2, 0x4e); // 0b01001110
         __m128i c = _mm_or_si128(y1, y2);
         c = _mm_add_epi32(c, min128);
@@ -347,13 +347,13 @@ namespace {
                              uint64_t rmax, int32_t min)
     {
         DMSG("fillArray128_maxint step 1");
-        uint32_t mxcsr = _mm_getcsr();
+        //uint32_t mxcsr = _mm_getcsr();
         //xoox xxxx xxxxxxxx
         //1001 f    f   f
         //9fff
         //6000
         //_mm_setcsr((mxcsr & 0xF3FF) | 0x0400);
-        _mm_setcsr((mxcsr & 0x9fff) | 0x6000);
+        //_mm_setcsr((mxcsr & 0x9fff) | 0x6000);
         w128_t * pstate = reinterpret_cast<w128_t *>(state);
         w128_t * array = reinterpret_cast<w128_t *>(array32);
         __m128i min128 = _mm_set1_epi32(min);
@@ -377,7 +377,7 @@ namespace {
         }
         b = pstate[size - 1].sd128;
         array[j++].si128 = do_uniform128(a, b, max128, min128);
-        _mm_setcsr(mxcsr);
+        //_mm_setcsr(mxcsr);
     }
 
     int fillArray128_boxmuller(double * state, double * array,
@@ -458,7 +458,7 @@ namespace {
     {
         a = _mm256_add_pd(a, m_one256.sd256);
         a = _mm256_mul_pd(a, max256);
-        __m128i y = _mm256_cvtpd_epi32(a);
+        __m128i y = _mm256_cvttpd_epi32(a);
         return _mm_add_epi32(y, min128);
     }
 
@@ -473,8 +473,8 @@ namespace {
             __m256d sd256;
         };
         DMSG("fillArray256_maxint step 1");
-        uint32_t mxcsr = _mm_getcsr();
-        _mm_setcsr((mxcsr & 0x9fff) | 0x6000);
+        //uint32_t mxcsr = _mm_getcsr();
+        //_mm_setcsr((mxcsr & 0x9fff) | 0x6000);
         w128_t * pstate = reinterpret_cast<w128_t *>(state);
         w128_t * array = reinterpret_cast<w128_t *>(array32);
         __m128i min128 = _mm_set1_epi32(min);
@@ -507,7 +507,7 @@ namespace {
 #endif
             array[j++].si128 = do_uniform256(a, max256, min128);
         }
-        _mm_setcsr(mxcsr);
+        //_mm_setcsr(mxcsr);
         _mm256_zeroall();
     }
 #else
@@ -1104,8 +1104,8 @@ namespace MersenneTwister {
         if (cf.avx) {
             DMSG("fillArray_maxInt AVX test Start");
             int asize = blockSize() * 2;
-            int32_t * array1 = alignedAlloc<int32_t *>(asize * sizeof(double));
-            int32_t * array2 = alignedAlloc<int32_t *>(asize * sizeof(double));
+            int32_t * array1 = alignedAlloc<int32_t *>(asize * sizeof(int32_t));
+            int32_t * array2 = alignedAlloc<int32_t *>(asize * sizeof(int32_t));
             seed(0);
             fillArray64_maxint(state, array1, 200, 1);
             seed(0);
@@ -1123,8 +1123,8 @@ namespace MersenneTwister {
         if (cf.sse2) {
             DMSG("fillArray_maxInt SSE2 test Start");
             int asize = blockSize() * 2;
-            int32_t * array1 = alignedAlloc<int32_t *>(asize * sizeof(double));
-            int32_t * array2 = alignedAlloc<int32_t *>(asize * sizeof(double));
+            int32_t * array1 = alignedAlloc<int32_t *>(asize * sizeof(int32_t));
+            int32_t * array2 = alignedAlloc<int32_t *>(asize * sizeof(int32_t));
             seed(0);
             fillArray64_maxint(state, array1, 200, 1);
             seed(0);

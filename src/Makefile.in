@@ -91,10 +91,12 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = test_mt19937$(EXEEXT) test_mt19937_64$(EXEEXT) \
 	test_sfmt19937$(EXEEXT) test_dsfmt19937$(EXEEXT) \
-	test_version$(EXEEXT) test_dsfmtavx607$(EXEEXT)
+	test_version$(EXEEXT) test_dsfmtavx607$(EXEEXT) \
+	test_dsfmtavx19937$(EXEEXT)
 TESTS = test_mt19937$(EXEEXT) test_mt19937_64$(EXEEXT) \
 	test_sfmt19937$(EXEEXT) test_dsfmt19937$(EXEEXT) \
-	test_version$(EXEEXT) test_dsfmtavx607$(EXEEXT)
+	test_version$(EXEEXT) test_dsfmtavx607$(EXEEXT) \
+	test_dsfmtavx19937$(EXEEXT)
 noinst_PROGRAMS = cpu_feature$(EXEEXT) output$(EXEEXT) speed$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -145,7 +147,9 @@ am_libsfmt_dist_la_OBJECTS = libsfmt_dist_la-version.lo \
 	libsfmt_dist_la-cpu_feature.lo \
 	libsfmt_dist_la-aligned_alloc.lo libsfmt_dist_la-mt19937.lo \
 	libsfmt_dist_la-mt19937_64.lo libsfmt_dist_la-sfmt19937.lo \
-	libsfmt_dist_la-dSFMT19937.lo libsfmt_dist_la-dSFMTAVX607.lo
+	libsfmt_dist_la-dSFMT19937.lo libsfmt_dist_la-dSFMTAVX607.lo \
+	libsfmt_dist_la-dSFMTAVX19937.lo \
+	libsfmt_dist_la-sfmt_common.lo libsfmt_dist_la-dsfmt_avx.lo
 libsfmt_dist_la_OBJECTS = $(am_libsfmt_dist_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -166,6 +170,9 @@ speed_OBJECTS = $(am_speed_OBJECTS)
 am_test_dsfmt19937_OBJECTS = test_dsfmt19937.$(OBJEXT) \
 	$(am__objects_1)
 test_dsfmt19937_OBJECTS = $(am_test_dsfmt19937_OBJECTS)
+am_test_dsfmtavx19937_OBJECTS = test_dsfmtavx19937.$(OBJEXT) \
+	$(am__objects_1)
+test_dsfmtavx19937_OBJECTS = $(am_test_dsfmtavx19937_OBJECTS)
 am_test_dsfmtavx607_OBJECTS = test_dsfmtavx607.$(OBJEXT) \
 	$(am__objects_1)
 test_dsfmtavx607_OBJECTS = $(am_test_dsfmtavx607_OBJECTS)
@@ -232,14 +239,14 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libsfmt_dist_la_SOURCES) $(cpu_feature_SOURCES) \
 	$(output_SOURCES) $(speed_SOURCES) $(test_dsfmt19937_SOURCES) \
-	$(test_dsfmtavx607_SOURCES) $(test_mt19937_SOURCES) \
-	$(test_mt19937_64_SOURCES) $(test_sfmt19937_SOURCES) \
-	$(test_version_SOURCES)
+	$(test_dsfmtavx19937_SOURCES) $(test_dsfmtavx607_SOURCES) \
+	$(test_mt19937_SOURCES) $(test_mt19937_64_SOURCES) \
+	$(test_sfmt19937_SOURCES) $(test_version_SOURCES)
 DIST_SOURCES = $(libsfmt_dist_la_SOURCES) $(cpu_feature_SOURCES) \
 	$(output_SOURCES) $(speed_SOURCES) $(test_dsfmt19937_SOURCES) \
-	$(test_dsfmtavx607_SOURCES) $(test_mt19937_SOURCES) \
-	$(test_mt19937_64_SOURCES) $(test_sfmt19937_SOURCES) \
-	$(test_version_SOURCES)
+	$(test_dsfmtavx19937_SOURCES) $(test_dsfmtavx607_SOURCES) \
+	$(test_mt19937_SOURCES) $(test_mt19937_64_SOURCES) \
+	$(test_sfmt19937_SOURCES) $(test_version_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -565,12 +572,15 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-common_files = debug.h config.h sfmt-dist.h w256.h w128.h
+common_files = debug.h config.h sfmt-dist.h w256.h w128.h getopt.hpp \
+dsfmt_avx_xxx.h sfmt_common.h dsfmt_avx.h dsfmt_avx_common.h dSFMTAVX.hpp
+
 
 # LIB
 lib_LTLIBRARIES = libsfmt_dist.la
 libsfmt_dist_la_SOURCES = version.cpp cpu_feature.cpp aligned_alloc.cpp \
-mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp dSFMTAVX607.cpp
+mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp dSFMTAVX607.cpp \
+dSFMTAVX19937.cpp sfmt_common.cpp dsfmt_avx.cpp
 
 #libsfmt_dist_la_LDFLAGS = -no-undefined -version-info 0:2:0
 libsfmt_dist_la_CXXFLAGS = -I../include -O3 -Wall -Wextra \
@@ -581,18 +591,21 @@ test_mt19937_64_SOURCES = test_mt19937_64.cpp $(common_files)
 test_sfmt19937_SOURCES = test_sfmt19937.cpp $(common_files)
 test_dsfmt19937_SOURCES = test_dsfmt19937.cpp $(common_files)
 test_dsfmtavx607_SOURCES = test_dsfmtavx607.cpp $(common_files)
+test_dsfmtavx19937_SOURCES = test_dsfmtavx19937.cpp $(common_files)
 test_version_SOURCES = test_version.cpp $(common_files)
 test_mt19937_DEPENDENCIES = libsfmt_dist.la
 test_mt19937_64_DEPENDENCIES = libsfmt_dist.la
 test_sfmt19937_DEPENDENCIES = libsfmt_dist.la
 test_dsfmt19937_DEPENDENCIES = libsfmt_dist.la
 test_dsfmtavx607_DEPENDENCIES = libsfmt_dist.la
+test_dsfmtavx19937_DEPENDENCIES = libsfmt_dist.la
 test_version_DEPENDENCIES = libsfmt_dist.la
 test_mt19937_LDADD = -lsfmt_dist
 test_mt19937_64_LDADD = -lsfmt_dist
 test_sfmt19937_LDADD = -lsfmt_dist
 test_dsfmt19937_LDADD = -lsfmt_dist
 test_dsfmtavx607_LDADD = -lsfmt_dist
+test_dsfmtavx19937_LDADD = -lsfmt_dist
 test_version_LDADD = -lsfmt_dist
 cpu_feature_SOURCES = cpu_feature_main.cpp $(common_files)
 output_SOURCES = output.cpp $(common_files)
@@ -728,6 +741,10 @@ test_dsfmt19937$(EXEEXT): $(test_dsfmt19937_OBJECTS) $(test_dsfmt19937_DEPENDENC
 	@rm -f test_dsfmt19937$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(test_dsfmt19937_OBJECTS) $(test_dsfmt19937_LDADD) $(LIBS)
 
+test_dsfmtavx19937$(EXEEXT): $(test_dsfmtavx19937_OBJECTS) $(test_dsfmtavx19937_DEPENDENCIES) $(EXTRA_test_dsfmtavx19937_DEPENDENCIES) 
+	@rm -f test_dsfmtavx19937$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(test_dsfmtavx19937_OBJECTS) $(test_dsfmtavx19937_LDADD) $(LIBS)
+
 test_dsfmtavx607$(EXEEXT): $(test_dsfmtavx607_OBJECTS) $(test_dsfmtavx607_DEPENDENCIES) $(EXTRA_test_dsfmtavx607_DEPENDENCIES) 
 	@rm -f test_dsfmtavx607$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(test_dsfmtavx607_OBJECTS) $(test_dsfmtavx607_LDADD) $(LIBS)
@@ -758,14 +775,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-aligned_alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-cpu_feature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-dSFMT19937.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-dSFMTAVX19937.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-dSFMTAVX607.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-dsfmt_avx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-mt19937.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-mt19937_64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-sfmt19937.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-sfmt_common.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/speed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_dsfmt19937.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_dsfmtavx19937.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_dsfmtavx607.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mt19937.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_mt19937_64.Po@am__quote@
@@ -848,6 +869,27 @@ libsfmt_dist_la-dSFMTAVX607.lo: dSFMTAVX607.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='dSFMTAVX607.cpp' object='libsfmt_dist_la-dSFMTAVX607.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-dSFMTAVX607.lo `test -f 'dSFMTAVX607.cpp' || echo '$(srcdir)/'`dSFMTAVX607.cpp
+
+libsfmt_dist_la-dSFMTAVX19937.lo: dSFMTAVX19937.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -MT libsfmt_dist_la-dSFMTAVX19937.lo -MD -MP -MF $(DEPDIR)/libsfmt_dist_la-dSFMTAVX19937.Tpo -c -o libsfmt_dist_la-dSFMTAVX19937.lo `test -f 'dSFMTAVX19937.cpp' || echo '$(srcdir)/'`dSFMTAVX19937.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsfmt_dist_la-dSFMTAVX19937.Tpo $(DEPDIR)/libsfmt_dist_la-dSFMTAVX19937.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='dSFMTAVX19937.cpp' object='libsfmt_dist_la-dSFMTAVX19937.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-dSFMTAVX19937.lo `test -f 'dSFMTAVX19937.cpp' || echo '$(srcdir)/'`dSFMTAVX19937.cpp
+
+libsfmt_dist_la-sfmt_common.lo: sfmt_common.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -MT libsfmt_dist_la-sfmt_common.lo -MD -MP -MF $(DEPDIR)/libsfmt_dist_la-sfmt_common.Tpo -c -o libsfmt_dist_la-sfmt_common.lo `test -f 'sfmt_common.cpp' || echo '$(srcdir)/'`sfmt_common.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsfmt_dist_la-sfmt_common.Tpo $(DEPDIR)/libsfmt_dist_la-sfmt_common.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sfmt_common.cpp' object='libsfmt_dist_la-sfmt_common.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-sfmt_common.lo `test -f 'sfmt_common.cpp' || echo '$(srcdir)/'`sfmt_common.cpp
+
+libsfmt_dist_la-dsfmt_avx.lo: dsfmt_avx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -MT libsfmt_dist_la-dsfmt_avx.lo -MD -MP -MF $(DEPDIR)/libsfmt_dist_la-dsfmt_avx.Tpo -c -o libsfmt_dist_la-dsfmt_avx.lo `test -f 'dsfmt_avx.cpp' || echo '$(srcdir)/'`dsfmt_avx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsfmt_dist_la-dsfmt_avx.Tpo $(DEPDIR)/libsfmt_dist_la-dsfmt_avx.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='dsfmt_avx.cpp' object='libsfmt_dist_la-dsfmt_avx.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-dsfmt_avx.lo `test -f 'dsfmt_avx.cpp' || echo '$(srcdir)/'`dsfmt_avx.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1086,6 +1128,13 @@ test_version.log: test_version$(EXEEXT)
 test_dsfmtavx607.log: test_dsfmtavx607$(EXEEXT)
 	@p='test_dsfmtavx607$(EXEEXT)'; \
 	b='test_dsfmtavx607'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_dsfmtavx19937.log: test_dsfmtavx19937$(EXEEXT)
+	@p='test_dsfmtavx19937$(EXEEXT)'; \
+	b='test_dsfmtavx19937'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

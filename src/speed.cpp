@@ -10,9 +10,11 @@
 #include <sfmt-dist/sfmt19937.h>
 #include <sfmt-dist/dSFMT19937.h>
 #include <sfmt-dist/dSFMTAVX607.h>
+#include <sfmt-dist/dSFMTAVX19937.h>
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
+//#include "dSFMTAVX.hpp"
 #include "getopt.hpp"
 
 using namespace std;
@@ -80,6 +82,10 @@ int main(int argc, char * argv[])
         <MersenneTwister::DSFMTAVX607> davxunif;
     typedef MersenneTwister::NormalFromDouble
         <MersenneTwister::DSFMTAVX607> davxnorm;
+    typedef MersenneTwister::UniformIntFromDouble
+        <MersenneTwister::DSFMTAVX19937> davxunif19937;
+    typedef MersenneTwister::NormalFromDouble
+        <MersenneTwister::DSFMTAVX19937> davxnorm19937;
     std::mt19937 mt(seed);
     MersenneTwister::MT19937 MT(seed);
     MersenneTwister::SFMT19937 sfmt(seed);
@@ -110,6 +116,10 @@ int main(int argc, char * argv[])
             cout << "MersenneTwister::dSFMTAVX607,";
             d_speed<uint32_t, davxunif>(start, end, seed, count);
             break;
+        case 'A':
+            cout << "MersenneTwister::dSFMTAVX19937,";
+            d_speed<uint32_t, davxunif19937>(start, end, seed, count);
+            break;
         default:
             break;
         }
@@ -139,6 +149,10 @@ int main(int argc, char * argv[])
         case 'a':
             cout << "MersenneTwister::dSFMTAVX607,";
             d_speed<double, davxnorm>(0.0, 1.0, seed, count);
+            break;
+        case 'A':
+            cout << "MersenneTwister::dSFMTAVX19937,";
+            d_speed<double, davxnorm19937>(0.0, 1.0, seed, count);
             break;
         default:
             break;
