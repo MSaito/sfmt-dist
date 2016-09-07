@@ -1,5 +1,4 @@
 #include "sfmt-dist.h"
-//#include "dSFMTAVX.hpp"
 #include <sfmt-dist/dSFMTAVX19937.h>
 #include <cmath>
 #include <cfloat>

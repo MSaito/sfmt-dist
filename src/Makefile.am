@@ -1,5 +1,5 @@
 common_files = debug.h config.h sfmt-dist.h w256.h w128.h getopt.hpp \
-dsfmt_avx_xxx.h sfmt_common.h dsfmt_avx.h dsfmt_avx_common.h dSFMTAVX.hpp
+sfmt_common.h dsfmt_avx.h dsfmt_avx_common.h dsfmt_avx_params.h
 
 # LIB
 lib_LTLIBRARIES = libsfmt_dist.la

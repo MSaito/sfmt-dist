@@ -1,9 +1,8 @@
 #pragma once
-#ifndef DSFMT_AVX_COMMON_H
-#define DSFMT_AVX_COMMON_H
+#ifndef SFMT_DIST_DSFMT_AVX_COMMON_H
+#define SFMT_DIST_DSFMT_AVX_COMMON_H
 
 #include "sfmt-dist.h"
-#include "dsfmt_avx.h"
 #include "w256.h"
 
 #include <sfmt-dist/cpu_feature.h>
@@ -452,6 +451,102 @@ namespace {
         _mm256_zeroall();
     }
 
+    /**
+     * This function fills the user-specified array with pseudorandom
+     * integers.
+     * @param p parameter
+     * @param state SFMT internal state.
+     * @param array64 an 256-bit array to be filled by pseudorandom numbers.
+     * @param length number of 256-bit pseudorandom numbers to be generated.
+     */
+    void fillArray256_o0c1(double * state, double * array64,
+                           int length)
+    {
+        w256_t * pstate = reinterpret_cast<w256_t *>(state);
+        w256_t * array = reinterpret_cast<w256_t *>(array64);
+        const __m256i mask = mask1.si256;
+        __m256i lung = pstate[2].si256;
+//            __m256i a = pstate[0].si256;
+//            __m256i b = pstate[1].si256;
+        int i = 0;
+        for (; i < DSFMTAVX_SIZE - DSFMTAVX_POS1; i++) {
+            array[i].si256 = recursion256(mask,
+                                          pstate[i].si256,
+                                          pstate[i + DSFMTAVX_POS1].si256,
+                                          &lung);
+        }
+        for (; i < DSFMTAVX_SIZE - DSFMTAVX_POS1; i++) {
+            array[i].si256
+                = recursion256(mask,
+                               pstate[i].si256,
+                               array[i+DSFMTAVX_POS1-DSFMTAVX_SIZE].si256,
+                               &lung);
+        }
+        for (; i < length; i++) {
+            array[i].si256
+                = recursion256(mask,
+                               array[i - DSFMTAVX_SIZE].si256,
+                               array[i+DSFMTAVX_POS1-DSFMTAVX_SIZE].si256,
+                               &lung);
+            convert256_o0c1(array[i - DSFMTAVX_SIZE].sd256);
+        }
+        int j = 0;
+        for (int i = length - DSFMTAVX_SIZE; i < length ;i++) {
+            pstate[j++].si256 = array[i].si256;
+            convert256_o0c1(array[i].sd256);
+        }
+        pstate[DSFMTAVX_SIZE].si256 = lung;
+        _mm256_zeroall();
+    }
+
+    /**
+     * This function fills the user-specified array with pseudorandom
+     * integers.
+     * @param p parameter
+     * @param state SFMT internal state.
+     * @param array64 an 256-bit array to be filled by pseudorandom numbers.
+     * @param length number of 256-bit pseudorandom numbers to be generated.
+     */
+    void fillArray256_o0o1(double * state, double * array64,
+                           int length)
+    {
+        w256_t * pstate = reinterpret_cast<w256_t *>(state);
+        w256_t * array = reinterpret_cast<w256_t *>(array64);
+        const __m256i mask = mask1.si256;
+        __m256i lung = pstate[2].si256;
+//            __m256i a = pstate[0].si256;
+//            __m256i b = pstate[1].si256;
+        int i = 0;
+        for (; i < DSFMTAVX_SIZE - DSFMTAVX_POS1; i++) {
+            array[i].si256 = recursion256(mask,
+                                          pstate[i].si256,
+                                          pstate[i + DSFMTAVX_POS1].si256,
+                                          &lung);
+        }
+        for (; i < DSFMTAVX_SIZE - DSFMTAVX_POS1; i++) {
+            array[i].si256
+                = recursion256(mask,
+                               pstate[i].si256,
+                               array[i+DSFMTAVX_POS1-DSFMTAVX_SIZE].si256,
+                               &lung);
+        }
+        for (; i < length; i++) {
+            array[i].si256
+                = recursion256(mask,
+                               array[i - DSFMTAVX_SIZE].si256,
+                               array[i+DSFMTAVX_POS1-DSFMTAVX_SIZE].si256,
+                               &lung);
+            convert256_o0o1(array[i - DSFMTAVX_SIZE].si256);
+        }
+        int j = 0;
+        for (int i = length - DSFMTAVX_SIZE; i < length ;i++) {
+            pstate[j++].si256 = array[i].si256;
+            convert256_o0o1(array[i].si256);
+        }
+        pstate[DSFMTAVX_SIZE].si256 = lung;
+        _mm256_zeroall();
+    }
+
 #else // don't HAVE_AVX
     void fillState256(double *)
     {
@@ -650,14 +745,14 @@ namespace {
         w256_t w;
         __m128d axy[DSFMTAVX_SIZE * 2];
         double ar[DSFMTAVX_SIZE * 2];
+        __m256d * paxy = reinterpret_cast<__m256d *>(axy);
         fillState256(state);
         int p = 0;
         for (int i = 0; i < DSFMTAVX_SIZE; i++) {
             w.sd256 = state256[i].sd256;
             w.sd256 = _mm256_mul_pd(two256.sd256, w.sd256);
             w.sd256 = _mm256_add_pd(w.sd256, m_three256.sd256);
-            axy[i] = w.sd128[0];
-            axy[p + 1] = w.sd128[1];
+            paxy[i] = w.sd256;
             w.sd256 = _mm256_mul_pd(w.sd256, w.sd256);
             ar[p] = w.d[0] + w.d[1];
             ar[p + 1] = w.d[2] + w.d[3];
@@ -678,7 +773,6 @@ namespace {
         cmu.sd256 = _mm256_set1_pd(mu);
         csigma.sd256 = _mm256_set1_pd(sigma);
         int j = 0;
-        __m256d * paxy = reinterpret_cast<__m256d *>(axy);
         for (int i = 0; i < p / 2; i++) {
             __m256d md = _mm256_setr_pd(ar[j], ar[j], ar[j+1], ar[j+1]);
             md = _mm256_mul_pd(md, paxy[i]);
@@ -705,6 +799,102 @@ namespace {
         throw new std::logic_error("should not be called");
     }
     int fillArray256_boxmuller(double *, double *, double, double)
+    {
+        throw new std::logic_error("should not be called");
+    }
+#endif
+
+#if HAVE_SSE2
+    inline __m128i do_uniform128(w128_t *a0, w128_t *b0,
+                                 __m128d max128, __m128i min128)
+    {
+        __m128d a = _mm_add_pd(a0->sd128, m_one128.sd128); // SSE2
+        __m128d b = _mm_add_pd(b0->sd128, m_one128.sd128);
+        a = _mm_mul_pd(a, max128); // SSE2
+        b = _mm_mul_pd(b, max128);
+        __m128i y1 = _mm_cvttpd_epi32(a); // SSE2
+        __m128i y2 = _mm_cvttpd_epi32(b);
+        y2 = _mm_shuffle_epi32(y2, 0x4e); // 0b01001110 // SSE2
+        __m128i c = _mm_or_si128(y1, y2); // SSE2
+        c = _mm_add_epi32(c, min128);     // SSE2
+        return c;
+    }
+
+    void fillArray128_maxint(double * state, int32_t *array32,
+                             uint64_t rmax, int32_t min)
+    {
+        DMSG("fillArray128_maxint step 1");
+        w128_t * pstate = reinterpret_cast<w128_t *>(state);
+        w128_t * array = reinterpret_cast<w128_t *>(array32);
+        __m128i min128 = _mm_set1_epi32(min); // SSE2
+        __m128d max128 = _mm_set1_pd(static_cast<double>(rmax)); //SSE2
+        fillState64(state); // there is no fillState128
+        DMSG("fillArray128_maxint step 2");
+        int j = 0;
+        for (int i = 0; i < DSFMTAVX_SIZE * 2; i += 2) {
+            array[j++].si128
+                = do_uniform128(&pstate[i], &pstate[i + 1], max128, min128);
+        }
+        fillState64(state); // there is no fillState128
+        for (int i = 0; i < DSFMTAVX_SIZE * 2; i += 2) {
+            array[j++].si128
+                = do_uniform128(&pstate[i], &pstate[i + 1], max128, min128);
+        }
+    }
+
+    inline void do_boxmuller128(__m128d *axy, double * ar, w128_t *in)
+    {
+        w128_t w;
+        w.sd128 = in->sd128;
+        w.sd128 = _mm_mul_pd(two128.sd128, w.sd128); // SSE2
+        w.sd128 = _mm_add_pd(w.sd128, m_three128.sd128); // SSE2
+        *axy = w.sd128;
+        w.sd128 = _mm_mul_pd(w.sd128, w.sd128);
+        *ar = w.d[0] + w.d[1];
+    }
+
+    inline __m128d do2_boxmuller128(double d, __m128d xy, __m128d csigma,
+                                    __m128d cmu)
+    {
+        __m128d md = _mm_set1_pd(d); // SSE2
+        md = _mm_mul_pd(md, xy); // SSE2
+        md = _mm_mul_pd(md, csigma);
+        return _mm_add_pd(md, cmu); // SSE2
+    }
+
+    int fillArray128_boxmuller(double * state, double * array,
+                               double mu, double sigma)
+    {
+        w128_t * state128 = reinterpret_cast<w128_t *>(state);
+        w128_t * array128 = reinterpret_cast<w128_t *>(array);
+        __m128d axy[DSFMTAVX_SIZE * 2];
+        double ar[DSFMTAVX_SIZE * 2];
+        fillState64(state); // there is no fillState128
+        for (int i = 0; i < DSFMTAVX_SIZE * 2; i++) {
+            do_boxmuller128(&axy[i], &ar[i], &state128[i]);
+        }
+        int p = 0;
+        for (int i = 0; i < DSFMTAVX_SIZE * 2; i++) {
+            if (ar[i] > 1.0 || ar[i] == 0.0) {
+                continue;
+            }
+            axy[p] = axy[i];
+            ar[p] = sqrt(-2.0 * log(ar[i]) / ar[i]);
+            p++;
+        }
+        __m128d cmu = _mm_set1_pd(mu); // SSE2
+        __m128d csigma = _mm_set1_pd(sigma);
+        for (int i = 0; i < p; i++) {
+            array128[i].sd128 = do2_boxmuller128(ar[i], axy[i], csigma, cmu);
+        }
+        return p * 2;
+    }
+#else // HAVE_SSE2
+    void fillArray128_maxint(double *, int32_t *, uint64_t, int32_t)
+    {
+        throw new std::logic_error("should not be called");
+    }
+    int fillArray128_boxmuller(double *, double *, double, double)
     {
         throw new std::logic_error("should not be called");
     }
@@ -759,4 +949,4 @@ namespace {
 /* Local Variables:  */
 /* mode: c++         */
 /* End:              */
-#endif // DSFMT_AVX_COMMON_H
+#endif // SFMT_DIST_DSFMT_AVX_COMMON_H

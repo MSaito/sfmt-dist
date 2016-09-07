@@ -14,7 +14,6 @@
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
-//#include "dSFMTAVX.hpp"
 #include "getopt.hpp"
 
 using namespace std;

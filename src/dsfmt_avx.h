@@ -1,7 +1,8 @@
 #pragma once
-#ifndef MT_DSFMT_AVX_H
-#define MT_DSFMT_AVX_H
+#ifndef SFMT_DIST_DSFMT_AVX_H
+#define SFMT_DIST_DSFMT_AVX_H
 
+#include "sfmt-dist.h"
 #include <stdint.h>
 #include <string>
 #include <sfmt-dist/cpu_feature.h>
@@ -151,4 +152,4 @@ namespace MersenneTwister
     }
 }
 
-#endif //
+#endif // SFMT_DIST_DSFMT_AVX_H

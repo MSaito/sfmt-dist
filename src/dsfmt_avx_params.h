@@ -1,6 +1,7 @@
 #pragma once
-#ifndef DSFMT_AVX_PARAMS_H
-#define DSFMT_AVX_PARAMS_H
+#ifndef SFMT_DIST_DSFMT_AVX_PARAMS_H
+#define SFMT_DIST_DSFMT_AVX_PARAMS_H
+#include "sfmt-dist.h"
 
 namespace {
     using namespace MersenneTwister;
@@ -87,8 +88,14 @@ namespace {
     const w256xd_t two256 = {{2.0, 2.0, 2.0, 2.0}};
     const w256xd_t m_three256 = {{-3.0, -3.0, -3.0, -3.0}};
 #endif
+#if HAVE_SSE2
+    const w128_t one128 = {{1, 1}};
+    const w128xd_t m_one128 = {{-1.0, -1.0}};
+    const w128xd_t two128 = {{2.0, 2.0}};
+    const w128xd_t m_three128 = {{-3.0, -3.0}};
+#endif
 }
 /* Local Variables:  */
 /* mode: c++         */
 /* End:              */
-#endif // DSFMT_AVX_PARAMS_H
+#endif // SFMT_DIST_DSFMT_AVX_PARAMS_H

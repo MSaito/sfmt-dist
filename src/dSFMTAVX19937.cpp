@@ -1,3 +1,4 @@
+//#define DEBUG 1
 #include "sfmt-dist.h"
 #include <sfmt-dist/dSFMTAVX19937.h>
 #include "w256.h"
@@ -67,13 +68,13 @@ namespace MersenneTwister {
     void DSFMTAVX19937::d_p()
     {
         cout << "debug_print" << endl;
-        cout << "array_size = " << dec << array_size << endl;
-        cout << "mexp = " << dec << mexp << endl;
-        cout << "pos1 = " << dec << pos1 << endl;
-        cout << "mask[0] = " << hex << mask.u64[0] << endl;
-        cout << "mask[1] = " << hex << mask.u64[1] << endl;
-        cout << "mask[2] = " << hex << mask.u64[2] << endl;
-        cout << "mask[3] = " << hex << mask.u64[3] << endl;
+        cout << "array_size = " << dec << DSFMTAVX_SIZE << endl;
+        cout << "mexp = " << dec << DSFMTAVX_MEXP << endl;
+        cout << "pos1 = " << dec << DSFMTAVX_POS1 << endl;
+        cout << "mask[0] = " << hex << mask1.u64[0] << endl;
+        cout << "mask[1] = " << hex << mask1.u64[1] << endl;
+        cout << "mask[2] = " << hex << mask1.u64[2] << endl;
+        cout << "mask[3] = " << hex << mask1.u64[3] << endl;
         w256_t * state256 = reinterpret_cast<w256_t *>(state);
         for (int i = 0; i < stateSize + 1; i++) {
             for (int j = 0; j < 4; j++) {
@@ -223,7 +224,8 @@ namespace MersenneTwister {
         if ((align == 0) && cf.avx2) {
             fillArray256_maxint(state, array, rmax, min);
         } else if ((align % 16 == 0) && cf.sse2) {
-            //fillArray128_maxint(state, array, rmax, min);
+            fillArray128_maxint(state, array, rmax, min);
+            //fillArray64_maxint(state, array, rmax, min);
         } else {
             fillArray64_maxint(state, array, rmax, min);
         }
@@ -240,8 +242,8 @@ namespace MersenneTwister {
         if ((align == 0) && cf.avx2) {
             return fillArray256_boxmuller(state, array, mu, sigma);
         } else if ((align % 16 == 0) && cf.sse2) {
-            //return fillArray128_boxmuller(state, array, mu, sigma);
-            return fillArray64_boxmuller(state, array, mu, sigma);
+            return fillArray128_boxmuller(state, array, mu, sigma);
+            //return fillArray64_boxmuller(state, array, mu, sigma);
         } else {
             return fillArray64_boxmuller(state, array, mu, sigma);
         }
@@ -268,11 +270,37 @@ namespace MersenneTwister {
                 if (fabs(array1[i] - array2[i]) >= DBL_EPSILON) {
                     DMSG("fillArray_maxInt AVX test NG array mismatch");
 #if defined(DEBUG)
-                    std::cout << "i = " << std::dec << i << std::endl;
+                    cout << "i = " << dec << i << endl;
+                    cout << "array1:" << dec << array1[i] << endl;
+                    cout << "array2:" << dec << array2[i] << endl;
 #endif
                     return false;
                 }
             }
+        }
+        if (cf.sse2) {
+            DMSG("fillArray_maxInt SSE2 test Start");
+            int asize = mt1.blockSize() * 2;
+            int32_t * array1 = alignedAlloc<int32_t *>(asize * sizeof(double));
+            int32_t * array2 = alignedAlloc<int32_t *>(asize * sizeof(double));
+            mt2.cf.avx2 = 0;
+            mt2.cf.sse2 = 0;
+            cpu_feature_t cf = mt1.cf;
+            mt1.cf.avx2 = 0;
+            mt1.fillArrayMaxInt(array1, 200, 1);
+            mt2.fillArrayMaxInt(array2, 200, 1);
+            for (int i = 0; i < asize; i++) {
+                if (fabs(array1[i] - array2[i]) >= DBL_EPSILON) {
+                    DMSG("fillArray_maxInt SSE2 test NG array mismatch");
+#if defined(DEBUG)
+                    cout << "i = " << dec << i << endl;
+                    cout << "array1:" << dec << array1[i] << endl;
+                    cout << "array2:" << dec << array2[i] << endl;
+#endif
+                    return false;
+                }
+            }
+            mt1.cf = cf;
         }
         DMSG("fillArray_maxInt test OK");
         DMSG("fillArray_boxmuller test Start");
@@ -282,21 +310,55 @@ namespace MersenneTwister {
             double * array2 = alignedAlloc<double *>(asize * sizeof(double));
             mt1.seed(0);
             mt2.seed(0);
+            mt2.cf.avx2 = 0;
+            mt2.cf.sse2 = 0;
             int c1 = mt1.fillArrayNormalDist(array1, 0, 1.0);
             int c2 = mt2.fillArrayNormalDist(array2, 0, 1.0);
             if (c1 != c2) {
-                DMSG("fillArray_boxmuller test NG c1 != c2");
+                DMSG("fillArray_boxmuller AVX test NG c1 != c2");
                 return false;
             }
             for (int i = 0; i < asize; i++) {
                 if (fabs(array1[i] - array2[i]) >= DBL_EPSILON) {
-                    DMSG("fillArray_boxmuller test NG array mismatch");
+                    DMSG("fillArray_boxmuller AVX test NG array mismatch");
 #if defined(DEBUG)
-                    std::cout << "i = " << std::dec << i << std::endl;
+                    cout << "i = " << dec << i << endl;
+                    cout << "array1:" << dec << array1[i] << endl;
+                    cout << "array2:" << dec << array2[i] << endl;
 #endif
                     return false;
                 }
             }
+            DMSG("fillArray_boxmuller test OK");
+        }
+        if (cf.sse2) {
+            int asize = mt1.blockSize();
+            double * array1 = alignedAlloc<double *>(asize * sizeof(double));
+            double * array2 = alignedAlloc<double *>(asize * sizeof(double));
+            mt1.seed(0);
+            mt2.seed(0);
+            mt2.cf.avx2 = 0;
+            mt2.cf.sse2 = 0;
+            cpu_feature_t cf = mt1.cf;
+            mt1.cf.avx2 = 0;
+            int c1 = mt1.fillArrayNormalDist(array1, 0, 1.0);
+            int c2 = mt2.fillArrayNormalDist(array2, 0, 1.0);
+            if (c1 != c2) {
+                DMSG("fillArray_boxmuller SSE2 test NG c1 != c2");
+                return false;
+            }
+            for (int i = 0; i < asize; i++) {
+                if (fabs(array1[i] - array2[i]) >= DBL_EPSILON) {
+                    DMSG("fillArray_boxmuller SSE2 test NG array mismatch");
+#if defined(DEBUG)
+                    cout << "i = " << dec << i << endl;
+                    cout << "array1:" << dec << array1[i] << endl;
+                    cout << "array2:" << dec << array2[i] << endl;
+#endif
+                    return false;
+                }
+            }
+            mt1.cf = cf;
             DMSG("fillArray_boxmuller test OK");
         }
         return true;
