@@ -1,3 +1,4 @@
+#include <sfmt-dist/version.h>
 #include "sfmt-dist.h"
 
 namespace MersenneTwister {
