@@ -12,9 +12,12 @@
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
+#include <sfmt-dist/Ziggurat.hpp>
+#include <sfmt-dist/KISS.hpp>
 #include "getopt.hpp"
 
 using namespace std;
+using namespace Ziggurat;
 
 template<typename T, typename D, typename E>
 int speed(T p1, T p2, E& engine, uint64_t count)
@@ -126,6 +129,34 @@ int main(int argc, char * argv[])
         case 'd':
             cout << "MersenneTwister::dSFMT19937,";
             d_speed<double, dnorm>(0.0, 1.0, seed, count);
+            break;
+        default:
+            break;
+        }
+    } else if (opt.ziggurat) {
+        cout << "#ziggurat normal distribution for " << dec << count
+             << " generation" << endl;
+        switch (opt.generator_kind) {
+        case 'k':
+            cout << "std::mt19937,";
+            //std::mt19937 mt(seed);
+            d_speed<float, ZigNormal<KISS> >(0.0, 1.0, seed, count);
+            break;
+        case 'm':
+            cout << "std::mt19937,";
+            //std::mt19937 mt(seed);
+            d_speed<float, ZigNormal<std::mt19937> >(0.0, 1.0, seed, count);
+            break;
+        case 'M':
+            cout << "MersenneTwister::mt19937,";
+            //MersenneTwister::MT19937 mt(seed);
+            d_speed<float, ZigNormal<MersenneTwister::MT19937> >(0.0,
+                                                               1.0, seed, count);
+            break;
+        case 'S':
+            cout << "MersenneTwister::SFMT19937,";
+            d_speed<float, ZigNormal<MersenneTwister::SFMT19937> >(0.0, 1.0,
+                                                                 seed, count);
             break;
         default:
             break;

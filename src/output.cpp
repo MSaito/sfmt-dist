@@ -12,6 +12,8 @@
 #include <sfmt-dist/mt19937.h>
 #include <sfmt-dist/normalFromDouble.hpp>
 #include <sfmt-dist/uniformIntFromDouble.hpp>
+#include <sfmt-dist/Ziggurat.hpp>
+#include <sfmt-dist/KISS.hpp>
 #include "getopt.hpp"
 
 using std::cout;
@@ -64,6 +66,19 @@ int d_uniform(uint64_t count, uint32_t seed, int32_t start, int32_t end)
     cout.setf(std::ios::fixed);
     for (uint64_t i = 0; i < count; ++i) {
         cout << dec << dist() << endl;
+    }
+    return 0;
+}
+
+template<typename Engine>
+int zignormal(uint64_t count, uint32_t seed)
+{
+    using namespace Ziggurat;
+    ZigNormal<Engine> zn(0.0, 1.0);
+    zn.seed(seed);
+    cout.setf(std::ios::fixed);
+    for (uint64_t i = 0; i < count; ++i) {
+        cout << dec << setprecision(20) << zn() << endl;
     }
     return 0;
 }
@@ -122,6 +137,29 @@ int main(int argc, char * argv[])
         case 'd':
             cout << "MersenneTwister::dSFMT19937" << endl;
             d_normal(count, seed);
+            break;
+        default:
+            break;
+        }
+    } else if (opt.ziggurat) {
+        using namespace Ziggurat;
+        cout << "#ziggurat normal distribution:";
+        switch (opt.generator_kind) {
+        case 'k':
+            cout << "KISS" << endl;
+            zignormal<KISS>(count, seed);
+            break;
+        case 'm':
+            cout << "std::mt19937" << endl;
+            zignormal<std::mt19937>(count, seed);
+            break;
+        case 'M':
+            cout << "MersenneTwister::mt19937" << endl;
+            zignormal<MersenneTwister::MT19937>(count, seed);
+            break;
+        case 'S':
+            cout << "MersenneTwister::SFMT19937" << endl;
+            zignormal<MersenneTwister::SFMT19937>(count, seed);
             break;
         default:
             break;

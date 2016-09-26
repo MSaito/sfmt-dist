@@ -143,7 +143,7 @@ am_libsfmt_dist_la_OBJECTS = libsfmt_dist_la-version.lo \
 	libsfmt_dist_la-cpu_feature.lo \
 	libsfmt_dist_la-aligned_alloc.lo libsfmt_dist_la-mt19937.lo \
 	libsfmt_dist_la-mt19937_64.lo libsfmt_dist_la-sfmt19937.lo \
-	libsfmt_dist_la-dSFMT19937.lo
+	libsfmt_dist_la-dSFMT19937.lo libsfmt_dist_la-ziggurat1.lo
 libsfmt_dist_la_OBJECTS = $(am_libsfmt_dist_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -561,7 +561,7 @@ common_files = debug.h config.h sfmt-dist.h
 # LIB
 lib_LTLIBRARIES = libsfmt_dist.la
 libsfmt_dist_la_SOURCES = version.cpp cpu_feature.cpp aligned_alloc.cpp \
-mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp
+mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp ziggurat1.cpp
 
 #libsfmt_dist_la_LDFLAGS = -no-undefined -version-info 0:2:0
 libsfmt_dist_la_CXXFLAGS = -I../include -O3 -Wall -Wextra \
@@ -739,6 +739,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-mt19937_64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-sfmt19937.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-version.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsfmt_dist_la-ziggurat1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/speed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_dsfmt19937.Po@am__quote@
@@ -815,6 +816,13 @@ libsfmt_dist_la-dSFMT19937.lo: dSFMT19937.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='dSFMT19937.cpp' object='libsfmt_dist_la-dSFMT19937.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-dSFMT19937.lo `test -f 'dSFMT19937.cpp' || echo '$(srcdir)/'`dSFMT19937.cpp
+
+libsfmt_dist_la-ziggurat1.lo: ziggurat1.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -MT libsfmt_dist_la-ziggurat1.lo -MD -MP -MF $(DEPDIR)/libsfmt_dist_la-ziggurat1.Tpo -c -o libsfmt_dist_la-ziggurat1.lo `test -f 'ziggurat1.cpp' || echo '$(srcdir)/'`ziggurat1.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libsfmt_dist_la-ziggurat1.Tpo $(DEPDIR)/libsfmt_dist_la-ziggurat1.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ziggurat1.cpp' object='libsfmt_dist_la-ziggurat1.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsfmt_dist_la_CXXFLAGS) $(CXXFLAGS) -c -o libsfmt_dist_la-ziggurat1.lo `test -f 'ziggurat1.cpp' || echo '$(srcdir)/'`ziggurat1.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

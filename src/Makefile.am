@@ -3,7 +3,7 @@ common_files = debug.h config.h sfmt-dist.h
 # LIB
 lib_LTLIBRARIES = libsfmt_dist.la
 libsfmt_dist_la_SOURCES = version.cpp cpu_feature.cpp aligned_alloc.cpp \
-mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp
+mt19937.cpp mt19937_64.cpp sfmt19937.cpp dSFMT19937.cpp ziggurat1.cpp
 #libsfmt_dist_la_LDFLAGS = -no-undefined -version-info 0:2:0
 libsfmt_dist_la_CXXFLAGS = -I../include -O3 -Wall -Wextra \
 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS

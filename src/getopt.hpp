@@ -10,6 +10,7 @@ class options {
 public:
     int count;
     bool normal_dist;
+    bool ziggurat;
     bool uniform_dist;
     char generator_kind;
     uint32_t seed;
@@ -29,11 +30,13 @@ public:
         string pgm = argv[0];
         static struct option longopts[] = {
             {"normal", no_argument, NULL, 'n'},
+            {"ziggurat", no_argument, NULL, 'z'},
             {"uniform", required_argument, NULL, 'u'},
             {"std-mt", optional_argument, NULL, 'm'},
             {"mt-mt", optional_argument, NULL, 'M'},
             {"sfmt", optional_argument, NULL, 'S'},
             {"dsfmt", optional_argument, NULL, 'd'},
+            {"kiss", optional_argument, NULL, 'k'},
             {"seed", required_argument, NULL, 's'},
             {"count", required_argument, NULL, 'c'},
             {"start", required_argument, NULL, 'f'},
@@ -41,7 +44,7 @@ public:
             {NULL, 0, NULL, 0}};
         errno = 0;
         for (;;) {
-            c = getopt_long(argc, argv, "numMSds:c:f:l:", longopts, NULL);
+            c = getopt_long(argc, argv, "nzumMSdks:c:f:l:", longopts, NULL);
             if (error) {
                 break;
             }
@@ -83,10 +86,14 @@ public:
             case 'n':
                 normal_dist = true;
                 break;
+            case 'z':
+                ziggurat = true;
+                break;
             case 'm':
             case 'M':
             case 'S':
             case 'd':
+            case 'k':
                 generator_kind = c;
                 break;
             case '?':
@@ -99,7 +106,7 @@ public:
             output_help(pgm);
             return false;
         }
-        if (!(normal_dist || uniform_dist)) {
+        if (!(normal_dist || uniform_dist || ziggurat)) {
             output_help(pgm);
             return false;
         }
@@ -112,14 +119,17 @@ public:
 
     void output_help(std::string& pgm) {
         using namespace std;
-        cout << pgm << " [-n|-u] [-m|-M|-S|-d] [-s seed] [-c count]"
+        cout << pgm << " [-n|-u|-z] [-m|-M|-S|-d|-k] [-s seed] [-c count]"
              << " [-f start] [-l end]" << endl;
         cout << "-n --normal   normal distribution" << endl;
+        cout << "-z --ziggurat normal distribution by ziggurat algorithm"
+             << endl;
         cout << "-u --uniform  uniform distribution" << endl;
         cout << "-m --std-mt   std::mersennetwister19937" << endl;
         cout << "-M --mt-mt    MersenneTwister19937" << endl;
         cout << "-S --sfmt     SFMT19937" << endl;
         cout << "-d --dsfmt    dSFMT19937" << endl;
+        cout << "-k --kiss     KISS" << endl;
         cout << "-s --seed     seed" << endl;
         cout << "-c --count    count" << endl;
         cout << "-f --start    start of uniform range" << endl;

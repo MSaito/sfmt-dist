@@ -2,6 +2,27 @@
 
 sfmt distribution
 
+LICENSE
+=======
+the GNU LGPL license is applied for KISS.hpp and Ziggurat.hpp in
+include/sfmt-dist directory.
+
+MIT License for all other codes.
+
+NOTE
+====
+Ziggurat algorithm returns single precision floating point numbers.
+KISS random number generator is presented only because that is
+used in original Ziggurat algorithm.
+
+Ziggurat algorithm can combine with any 32-bit uniform random number
+generators.
+
+NormalFromDouble uses Polar form of Box-Mullar transform.
+Currently, NormalFromDouble accecpts dSFMT generator only.
+Currently, UniformFromDouble accecpts dSFMT generator only.
+
+
 STANDARD INTERFACE
 ==================
 std::uniform_int_distribution and std::normal_distribution adaptable
@@ -35,6 +56,21 @@ sample code
         cout << dec << dist() << endl;
     }
 
+Ziggurat Algorithm
+==================
+    Fast normal distribution generation algorithm.
+    Ziggurat.hpp only support single precision.
+
+sample code
+-----------
+    using Ziggurat::ZigNormal;
+    using MersenneTwister::SFMT19937;
+    ZigNormal<SFMT19937> dist(0.0, 1.0, 1234);
+    cout.setf(std::ios::fixed);
+    for (uint64_t i = 0; i < 100; ++i) {
+        cout << dec << setprecision(20) << dist() << endl;
+    }
+
 TEST PROGRAM
 ============
 
@@ -52,10 +88,12 @@ can check outputs and measure speed.
     ./output [-n|-u] [-m|-M|-S|-d] [-s seed] [-c count] [-f start] [-l end]
     -n --normal   normal distribution
     -u --uniform  uniform distribution
+    -z --ziggurat normal distribution using ziggurat algorithm
     -m --std-mt   std::mersennetwister19937
     -M --mt-mt    MersenneTwister19937
     -S --sfmt     SFMT19937
     -d --dsfmt    dSFMT19937
+    -k --kiss     KISS
     -s --seed     seed
     -c --count    count
     -f --start    start of uniform range
@@ -78,10 +116,12 @@ can check outputs and measure speed.
     ./speed [-n|-u] [-m|-M|-S|-d] [-s seed] [-c count] [-f start] [-l end]
     -n --normal   normal distribution
     -u --uniform  uniform distribution
+    -z --ziggurat normal distribution using ziggurat algorithm
     -m --std-mt   std::mersennetwister19937
     -M --mt-mt    MersenneTwister19937
     -S --sfmt     SFMT19937
     -d --dsfmt    dSFMT19937
+    -k --kiss     KISS
     -s --seed     seed
     -c --count    count
     -f --start    start of uniform range
