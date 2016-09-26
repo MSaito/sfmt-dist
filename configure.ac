@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([sfmt-dist], [0.1], [saito@manieth.com])
+AC_INIT([sfmt-dist], [0.2], [saito@manieth.com])
 LT_INIT
 AC_CONFIG_SRCDIR([src/Makefile.am])
 AC_CONFIG_HEADERS([src/config.h])

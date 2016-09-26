@@ -1,0 +1,8 @@
+2016-9-26 Mutsuo Saito <saito@manieth.com>
+	* version 0.2
+	* add Ziggurat Algorithm and KISS generator.
+	* include/sfmt-dist/KISS.hpp add
+	* include/sfmt-dist/Ziggurat.hpp add
+	* src/output.cpp modified
+	* src/speed.cpp modified
+	* src/ziggurat1.cpp add
